@@ -6,7 +6,10 @@ Objetivo: gerenciamento de eventos acadêmicos, controle dinâmico entre inscri�
 
 Spring Boot 4.1.1: para ecossistemas mais maduras.
 MYSQL: banco de dados e consulta de queries nativas.
-Jakarta Validation (bean validation): filtração de validações rigídas nas bordas de aplicações
+Jakarta Validation (bean validation): filtração de validações rigídas nas bordas de aplicações.
+
+
+Grupo abortado no desenvolvimento: Gabriel Lucas, Luiz Eduardo e Vinicius da Cunha
 
 
 **OBSERVAÇÃO IMPORTANTE PARA A AVALIAÇÃO:**
