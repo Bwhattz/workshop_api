@@ -8,7 +8,7 @@ Spring Boot 4.1.1: para ecossistemas mais maduras.
 MYSQL: banco de dados e consulta de queries nativas.
 Jakarta Validation (bean validation): filtração de validações rigídas nas bordas de aplicações.
 
-#Equipe de desenvolvimento
+# Equipe de desenvolvimento
 
 Gabriel Lucas, Luiz Eduardo e Vinicius da Cunha
 
