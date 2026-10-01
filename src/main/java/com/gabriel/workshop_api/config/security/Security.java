@@ -46,12 +46,12 @@ public class Security {
 
         configuration.setAllowedOrigins(List.of("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
+        configuration.setAllowedMethods(Arrays.asList("Authorization", "Content-Type", "Accept"));
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource based = new UrlBasedCorsConfigurationSource();
 
-        source.registerCorsConfiguration("/*", configuration);
+        based.registerCorsConfiguration("/*", configuration);
 
-        return source;
+        return based;
     }
 }
