@@ -4,6 +4,7 @@ import com.gabriel.workshop_api.model.User;
 import com.gabriel.workshop_api.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +19,8 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private PasswordEncoder passwordEncoder;
+
     public UserService(UserRepository userRepository) {
 
         this.userRepository = userRepository;
@@ -26,6 +29,10 @@ public class UserService {
     @Transactional
     public User save(User user) {
 
+        validateEmail(user);
+
+        String passwordString = passwordEncoder.encode(user.getPassword());
+        user.setPassword(passwordString);
 
         return userRepository.save(user);
     }
@@ -78,7 +85,7 @@ public class UserService {
     }
 
     @Transactional
-    public void delete(Integer id) {
+    public void delete(Long id) {
 
         if(!userRepository.existsById(id)) {
             throw new IllegalArgumentException("Usuário não encontrado");

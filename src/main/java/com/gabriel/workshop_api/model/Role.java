@@ -28,11 +28,11 @@ public class Role {
 
     public void update(Role updateRole) {
 
-        if(this.getName() != null) {
+        if(updateRole.getName() != null) {
             this.name = updateRole.getName();
         }
 
-        if(this.getUsers() != null) {
+        if(updateRole.getUsers() != null) {
             this.users = updateRole.getUsers();
         }
     }

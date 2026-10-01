@@ -33,9 +33,6 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "birthdate", nullable = false)
-    private LocalDate birthdate;
-
     @ManyToMany
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles = new ArrayList<>();

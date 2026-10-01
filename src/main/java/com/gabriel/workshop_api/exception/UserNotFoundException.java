@@ -1,8 +1,8 @@
 package com.gabriel.workshop_api.exception;
 
-public class UserNotFound extends RuntimeException {
+public class UserNotFoundException extends RuntimeException {
 
-    public UserNotFound(String message) {
+    public UserNotFoundException(String message) {
         super(message);
     }
 }

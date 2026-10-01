@@ -1,4 +1,8 @@
 package com.gabriel.workshop_api.exception;
 
-public class RegistrationNotFoundException {
+public class RegistrationNotFoundException extends RuntimeException{
+
+    public RegistrationNotFoundException(String message) {
+        super(message);
+    }
 }
