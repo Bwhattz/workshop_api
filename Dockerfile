@@ -1,4 +1,7 @@
-FROM ubuntu:latest
-LABEL authors="Gabriel"
+FROM eclipse-temurin:21-jdk-alpine
 
-ENTRYPOINT ["top", "-b"]
+WORKDIR /app
+
+COPY target/workShop_api-0.0.1-SNAPSHOT.jar app.jar
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

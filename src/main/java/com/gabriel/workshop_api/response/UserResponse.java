@@ -1,6 +1,6 @@
 package com.gabriel.workshop_api.response;
 
-import com.gabriel.workshop_api.model.Role;
+import com.gabriel.workshop_api.emus.RoleType;
 import com.gabriel.workshop_api.model.User;
 
 import java.util.List;
@@ -10,7 +10,7 @@ public record UserResponse(
         String idUser,
         String name,
         String email,
-        List<Role> roles
+        List<RoleType> roles
 ) {
     public static UserResponse fromUser(User user) {
 
@@ -19,7 +19,8 @@ public record UserResponse(
                 user.getIdUser(),
                 user.getName(),
                 user.getEmail(),
-                user.getRoles()
+                user.getRoles() != null ? user.getRoles().stream()
+                                          .toList() : List.of()
         );
     }
 }

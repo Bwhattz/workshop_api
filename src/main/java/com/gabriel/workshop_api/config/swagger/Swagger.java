@@ -18,20 +18,22 @@ public class Swagger {
 
         final String securityScheme = "bearerAuth";
 
-        return new OpenAPI()
-                .info(new Info()
-                        .title("Sistema workshop")
-                        .version("v1.0.0")
-                        .description("Sistema de gerenciamento acâdemico")
-                        .contact(new Contact()
-                                .name("Gabriel Lucas")))
+       return new OpenAPI()
+               .info(new Info()
+                       .title("Anakaton Eventum")
+                       .description("Sistema de eventos academicos desenvolvido com api")
+                       .version("v3.0.0")
+                       .contact(new Contact()
+                               .name("Gabriel")
+                               .email("gabriel.lv.lucas@gmail.com")))
 
-                .addSecurityItem(new SecurityRequirement().addList(securityScheme))
-                .components(new Components()
-                        .addSecuritySchemes(securityScheme, new SecurityScheme()
-                                .name(securityScheme)
-                                .type(SecurityScheme.Type.HTTP)
-                                .scheme("bearer")
-                                .bearerFormat("JWT")));
+               .addSecurityItem(new SecurityRequirement()
+                       .addList(securityScheme))
+               .components(new Components()
+                       .addSecuritySchemes(securityScheme, new SecurityScheme()
+                               .name(securityScheme)
+                               .type(SecurityScheme.Type.HTTP)
+                               .scheme("bearer")
+                               .bearerFormat("JWT")));
     }
 }

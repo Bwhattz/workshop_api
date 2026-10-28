@@ -1,11 +1,12 @@
 package com.gabriel.workshop_api.model;
 
+import com.gabriel.workshop_api.emus.RoleType;
+import com.gabriel.workshop_api.emus.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -21,7 +22,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "idUser", nullable = false, unique = true)
+    @Column(name = "user_id", nullable = false, unique = true)
     private String idUser;
 
     @Column(name = "name", nullable = false, length = 150)
@@ -33,36 +34,47 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @ManyToMany
-    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private List<Role> roles = new ArrayList<>();
+    @Column(name = "status", nullable = false)
+    private UserStatus status;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role_user")
+    private Set<Role> roles = new HashSet<>();
 
     @PrePersist
-    public void generatedIdUser() {
+    public void prePersist() {
 
-        if(this.idUser == null || this.idUser.isBlank()) {
-            this.idUser = UUID.randomUUID().toString()
+        if (idUser == null || idUser.isBlank()) {
+            this.idUser = "USER" + UUID.randomUUID().toString()
                     .replace("-", "")
                     .substring(0, 8)
-                    .toUpperCase();
+                    .toLowerCase();
+        }
+
+        if(this.status == null) {
+            this.status = UserStatus.ACTIVED;
         }
     }
 
     public void update(User updateUser) {
 
-        if(updateUser.getName() != null) {
+        if (updateUser.getName() != null) {
             this.name = updateUser.getName();
         }
 
-        if(updateUser.getEmail() != null) {
+        if (updateUser.getEmail() != null) {
             this.email = updateUser.getEmail();
         }
 
-        if(updateUser.getPassword() != null) {
+        if (updateUser.getPassword() != null) {
             this.password = updateUser.getPassword();
         }
-        if(updateUser.getPassword() != null) {
-            this.password = updateUser.getPassword();
+
+        if (updateUser.getRoles() != null && !updateUser.getRoles().isEmpty()) {
+            this.roles.clear();
+            this.roles.addAll(updateUser.getRoles());
         }
     }
 }

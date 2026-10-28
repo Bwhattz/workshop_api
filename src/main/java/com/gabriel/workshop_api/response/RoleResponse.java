@@ -1,23 +1,18 @@
 package com.gabriel.workshop_api.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gabriel.workshop_api.model.Role;
 
 import java.util.List;
 
-public record RolesResponse(
+public record RoleResponse(
 
-        String roles,
-
-        @JsonIgnore
-        List<UserResponse> userResponse
+        String roles
 
 ) {
-    public static RolesResponse fromRoles(Role role) {
+    public static RoleResponse fromRole(Role role) {
 
         return new RoleResponse(
-                role.getName(),
-                role.getUsers() ?
-        )
+                role.getName()
+        );
     }
 }

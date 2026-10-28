@@ -12,24 +12,24 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
 
     @Query(
-            value = "SELECT event* FROM events AS event" +
+            value = "SELECT event.* FROM events AS event " +
                     "WHERE event.category_id = :categoryId",
             nativeQuery = true
     )
     Optional<Event> findByCategoryId(@Param("categoryId") Long categoryId);
 
     @Query(
-            value = "SELECT event.* FROM events AS event" +
-                    "WHERE event.organize_id = event.organize_id AND event.event_date BETWEEN event.start_time AND event.end_time",
+            value = "SELECT event.* FROM events AS event " +
+                    "WHERE event.organize_id = :organizeId AND event.event_date BETWEEN event.start_time AND event.end_time",
             nativeQuery = true
     )
     Optional<Event> findByConflictEvent(@Param("organizeId") Long organizaId, @Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
 
 
     @Query(
-            value = "SELECT COUNT(*) FROM events AS event" +
+            value = "SELECT COUNT(*) FROM events AS event " +
                     "INNER JOIN registrations AS registration ON registration.event_id" +
-                    "INNER JOIN ",
+                    "INNER JOIN events AS event ON event ",
             nativeQuery = true
     )
     long countConfirmedRegistration(@Param("eventId") Long id);

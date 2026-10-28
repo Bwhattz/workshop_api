@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Date;
 import java.util.List;
@@ -20,34 +21,33 @@ import java.util.stream.Collectors;
 @Service
 public class JwtService {
 
-
-    @Value("${api.security.token.secret:7f4c9b1a8e2d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b}")
-    private String secretString;
+    @Value("${api.security.token.secret}")
+    private String scriptSecret;
 
     private SecretKey cryptoKey;
 
-    private final static Long EXPIRATION_TIME = Duration.ofHours(12).toMillis();
+    private static final Long EXPIRATION_TIME = Duration.ofHours(12).toMillis();
 
     public JwtService(){}
 
     @PostConstruct
-    public void init() {
-        this.cryptoKey = Keys.hmacShaKeyFor(secretString.getBytes());
+    protected void init() {
+        this.cryptoKey = Keys.hmacShaKeyFor(scriptSecret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(User user) {
+    public String generateToken(User userToken) {
 
-        List<String> roles = user.getRoles().stream()
-                .map(RoleType::getAuthorize)
-                .collect(Collectors.toList());
+        List<String> roles = userToken.getRoles().stream()
+                .map(role -> role.getName())
+                .toList();
 
-        Date now = new Date();
 
         return Jwts.builder()
-                .subject(user.getEmail())
-                .claim("roles", roles)
-                .issuedAt(now)
-                .expiration(new Date(now.getTime() + EXPIRATION_TIME))
+                .subject(userToken.getEmail())
+                .claim("userId", userToken.getId())
+                .claim("userName", userToken.getName())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(cryptoKey)
                 .compact();
     }
@@ -55,34 +55,28 @@ public class JwtService {
     public boolean isTokenValid(String token) {
 
         try {
-            Date expiration = extractClaims(token, Claims::getExpiration);
-            return !expiration.before(new Date());
+            parseClaims(token);
+            return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
 
-    public String extractEmail(String token) {
-        return extractClaims(token, Claims::getSubject);
-    }
-
-    private <T> T extractClaims(String token, Function<Claims, T> fuction) {
-        final Claims claims = extractAllClaims(token);
-        return fuction.apply(claims);
-    }
-
-    private Claims extractAllClaims(String token) {
+    public Claims parseClaims(String tokenEmail) {
 
         return Jwts.parser()
                 .verifyWith(cryptoKey)
                 .build()
-                .parseSignedClaims(token)
+                .parseSignedClaims(tokenEmail)
                 .getPayload();
     }
 
-    @SuppressWarnings("unchecked")
-    public List<String> extractRoles(String token) {
-        final Claims claims = extractAllClaims(token);
-        return claims.get("roles", List.class);
+    public String extractEmail(String tokenEmail) {
+        return extractClaims(tokenEmail, Claims::getSubject);
+    }
+
+    private <T> T extractClaims(String tokenEmail, Function<Claims, T> claimsFunction) {
+        final Claims claim = parseClaims(tokenEmail);
+        return claimsFunction.apply(claim);
     }
 }

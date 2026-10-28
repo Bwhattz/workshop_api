@@ -1,5 +1,6 @@
 package com.gabriel.workshop_api.model;
 
+import com.gabriel.workshop_api.emus.EventStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,6 +36,10 @@ public class Event {
 
     @Column(name = "capacity", nullable = false)
     private Integer capacity;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private EventStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)

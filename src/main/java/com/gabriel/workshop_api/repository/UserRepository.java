@@ -13,7 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 
     @Query(
-            value = "SELECT user.* FROM users AS user" +
+            value = "SELECT user.* FROM users AS user " +
                     "WHERE user.name = :name AND user.email = :email",
             nativeQuery = true
     )
@@ -22,11 +22,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 
     @Query(
-            value = "SELECT user.* FROM users AS user" +
-                    "INNER JOIN user_roles AS user ON user_id = user.user_id" +
-                    "INNER JOIN roles AS role ON role.id = role.role_id" +
+            value = "SELECT user.* FROM users AS user " +
+                    "INNER JOIN user_roles AS user ON user_id = user.user_id " +
+                    "INNER JOIN roles AS role ON role.id = role.role_id " +
                     "WHERE role.name = :name",
             nativeQuery = true
     )
-    List<User> findByRolesNative(@Param("roleName") String roleName);
+    List<User> findByRolesNative(@Param("role_name") String roleName);
 }

@@ -1,6 +1,6 @@
 package com.gabriel.workshop_api.request;
 
-import com.gabriel.workshop_api.model.Role;
+import com.gabriel.workshop_api.emus.RoleType;
 import com.gabriel.workshop_api.model.User;
 import jakarta.validation.constraints.*;
 
@@ -20,10 +20,7 @@ public record UserRequest(
         @Size(min = 6, message = "É necessário pelo menos 6 caracteres")
         @Pattern(regexp =
                 "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,}$")
-        String password,
-
-        @NotNull(message = "O cargo precisa ser obrigátorio")
-        Role role
+        String password
 ) {
     public User toEntityUser() {
 
@@ -31,7 +28,7 @@ public record UserRequest(
                 .name(this.name())
                 .email(this.email())
                 .password(this.password())
-                .roles(List.of(role))
+                .role(RoleType.PARTICIPANT)
                 .build();
     }
 }

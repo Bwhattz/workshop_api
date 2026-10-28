@@ -24,10 +24,8 @@ public record EventRequest(
         @Positive(message = "A capacidade do evento precisa ser maior que zero")
         Integer capacity,
 
-        @NotNull(message = "O id da categoria é obrigátorio")
-
-
-
+        @NotNull(message = "A categoria do evento precisa ser obrigátorio")
+        Long idCategory
 ) {
 
     public Event toEntity() {
@@ -37,6 +35,6 @@ public record EventRequest(
                 .description(this.description())
                 .eventDate(this.eventDate())
                 .capacity(this.capacity())
-                .
+                .build();
     }
 }

@@ -1,9 +1,13 @@
 package com.gabriel.workshop_api.config.security;
 
+import com.gabriel.workshop_api.config.security.JwtAuthenticationFilter;
+import com.gabriel.workshop_api.config.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -30,15 +34,20 @@ public class Security {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth.
                         requestMatchers("/auth/**", "/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
-                        .requestMatchers("/users/**").hasRole("ADMIN")
-                        .requestMatchers("/roles/**").permitAll()
-                        .requestMatchers("/events/**").hasAnyRole("ADMIN", "ORGANIZER")
-                        .requestMatchers("/registration/**").hasRole("PARTICIPANT")
+                        .requestMatchers(HttpMethod.POST, "/users/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/registration/**").hasRole("PARTICIPANT")
                         .anyRequest().authenticated()).addFilterBefore(new JwtAuthenticationFilter(jwtService), UsernamePasswordAuthenticationFilter.class
                 );
 
         return httpSecurity.build();
+    }
+
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl.withDefaultRolePrefix()
+                .role("ADMIN")
+                .implies("USER", "PARTICIPANT")
+                .build();
     }
 
     @Bean

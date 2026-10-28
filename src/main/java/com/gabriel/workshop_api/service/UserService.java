@@ -1,16 +1,22 @@
 package com.gabriel.workshop_api.service;
 
+import com.gabriel.workshop_api.emus.RoleType;
+import com.gabriel.workshop_api.exception.RoleNotFoundException;
+import com.gabriel.workshop_api.exception.UserNotFoundException;
+import com.gabriel.workshop_api.model.Role;
 import com.gabriel.workshop_api.model.User;
+import com.gabriel.workshop_api.repository.RoleRepository;
 import com.gabriel.workshop_api.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     /**
@@ -19,20 +25,22 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
-
-        this.userRepository = userRepository;
-    }
+    private final RoleRepository roleRepository;
 
     @Transactional
     public User save(User user) {
 
+        Role defaultRole = roleRepository.findById(user.getId())
+                        .orElseThrow(() -> new RoleNotFoundException("Perfil de acesso não cadastrado no sistema"));
+
         validateEmail(user);
 
-        String passwordString = passwordEncoder.encode(user.getPassword());
-        user.setPassword(passwordString);
+        String passwordCrypto = passwordEncoder.encode(user.getPassword());
+        user.setPassword(passwordCrypto);
+
+        user.getRoles().add(defaultRole);
 
         return userRepository.save(user);
     }
@@ -61,11 +69,11 @@ public class UserService {
     public User update(User user) {
 
         User foundUser = userRepository.findById(user.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
 
         userRepository.findByUser(user.getName(), user.getEmail()).ifPresent(existsUser -> {
-            if(!foundUser.getName().equals(user.getName()) && !userRepository.existsByEmail(user.getEmail())) {
-                throw new IllegalArgumentException("Este usuário ja existe");
+            if(!foundUser.getId().equals(user.getId())) {
+                throw new IllegalArgumentException("Já existe outro usuário cadastro com este nome e email");
             }
         });
 
@@ -88,7 +96,7 @@ public class UserService {
     public void delete(Long id) {
 
         if(!userRepository.existsById(id)) {
-            throw new IllegalArgumentException("Usuário não encontrado");
+            throw new UserNotFoundException("Usuário não encontrado");
         }
 
         userRepository.deleteById(id);

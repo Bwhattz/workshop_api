@@ -30,4 +30,9 @@ public class GlobalException {
     public ResponseEntity<String> registrationNotFoundException(RegistrationNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
     }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<String> categoryNotFoundException(CategoryNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+    }
 }

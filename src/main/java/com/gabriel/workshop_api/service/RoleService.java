@@ -1,14 +1,16 @@
 package com.gabriel.workshop_api.service;
 
+import com.gabriel.workshop_api.exception.RoleNotFoundException;
+import com.gabriel.workshop_api.model.Registration;
 import com.gabriel.workshop_api.model.Role;
 import com.gabriel.workshop_api.model.User;
 import com.gabriel.workshop_api.repository.RoleRepository;
 import com.gabriel.workshop_api.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RoleService {
@@ -22,30 +24,30 @@ public class RoleService {
     }
 
     @Transactional
-    public Role save(Role roleSave) {
-
-        Role savedRole = roleRepository.save(roleSave);
-
-        User foundUser = userRepository.findById(savedRole.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Este usuário não existe para esse perfil de acesso"));
-
-
-        if(!foundUser.getRoles().contains(savedRole)) {
-            foundUser.getRoles().add(savedRole);
-        }
-
-        return roleRepository.save(savedRole);
+    public Role save(Role save) {
+        return roleRepository.save(save);
     }
 
+    @Transactional(readOnly = true)
     public List<Role> findAll() {
         return roleRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Role> findByRole(String nameRole) {
+        return roleRepository.findByRole(nameRole);
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> findAllRoles(Long id) {
+        return roleRepository.findAllRolesByUser(id);
     }
 
     @Transactional
     public Role update(Role role) {
 
         Role foundRole = roleRepository.findById(role.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Este perfil de acesso não existe"));
+                .orElseThrow(() -> new RoleNotFoundException("Este perfil de acesso não existe"));
 
         foundRole.update(role);
 
@@ -56,7 +58,7 @@ public class RoleService {
     public void delete(Long id) {
 
         if(!roleRepository.existsById(id)) {
-            throw new IllegalArgumentException("Este perfil de acesso não existe para ser excluído");
+            throw new RoleNotFoundException("Este perfil de acesso não existe para ser excluído");
         }
 
         roleRepository.deleteById(id);

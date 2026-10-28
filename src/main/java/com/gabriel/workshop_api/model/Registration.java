@@ -1,11 +1,10 @@
 package com.gabriel.workshop_api.model;
 
+import com.gabriel.workshop_api.emus.RegistrationStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.apache.catalina.User;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "registrations")
@@ -23,18 +22,26 @@ public class Registration {
     @Column(name = "registration_date", nullable = false)
     private LocalDateTime registrationDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private String status;
+    private RegistrationStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private List<User> users;
+    @JoinColumn(name = "registration_event_id", nullable = false)
+    private Event event;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_id", nullable = false)
-    private Event eventsId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "registration_user_id", nullable = false)
     private User user;
+
+    @PrePersist
+    protected void prePersist() {
+        if(registrationDate == null) {
+            this.registrationDate = LocalDateTime.now();
+        }
+
+        if(status == null) {
+            this.status = RegistrationStatus.CONFIRMED;
+        }
+    }
 }
