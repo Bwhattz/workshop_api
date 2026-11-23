@@ -1,6 +1,6 @@
 package com.gabriel.workshop_api.emus;
 
-public enum RoleType {
+public enum StatusProfile {
 
     ADMIN("ROLE_ADMIN"),
     ORGANIZE("ROLE_ORGANIZE"),
@@ -8,7 +8,7 @@ public enum RoleType {
 
     private String authorize;
 
-    RoleType(String authorize) {
+    StatusProfile(String authorize) {
         this.authorize = authorize;
     }
 

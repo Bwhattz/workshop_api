@@ -1,8 +1,8 @@
 package com.gabriel.workshop_api.controller;
 
 import com.gabriel.workshop_api.model.Certificate;
-import com.gabriel.workshop_api.request.CertificateRequest;
-import com.gabriel.workshop_api.response.CertificateResponse;
+import com.gabriel.workshop_api.dto.request.CertificateRequest;
+import com.gabriel.workshop_api.dto.response.CertificateResponse;
 import com.gabriel.workshop_api.service.CertificateService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

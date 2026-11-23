@@ -1,8 +1,6 @@
-package com.gabriel.workshop_api.response;
+package com.gabriel.workshop_api.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gabriel.workshop_api.emus.RegistrationStatus;
-import com.gabriel.workshop_api.model.Event;
 import com.gabriel.workshop_api.model.Registration;
 
 import java.time.LocalDateTime;

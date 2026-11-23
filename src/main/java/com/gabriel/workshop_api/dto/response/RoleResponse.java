@@ -1,9 +1,6 @@
-package com.gabriel.workshop_api.response;
+package com.gabriel.workshop_api.dto.response;
 
-import com.gabriel.workshop_api.emus.StatusProfile;
 import com.gabriel.workshop_api.model.Role;
-
-import java.util.List;
 
 public record RoleResponse(
 

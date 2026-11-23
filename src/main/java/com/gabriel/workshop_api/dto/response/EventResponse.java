@@ -1,6 +1,5 @@
-package com.gabriel.workshop_api.response;
+package com.gabriel.workshop_api.dto.response;
 
-import com.gabriel.workshop_api.emus.EventStatus;
 import com.gabriel.workshop_api.model.Event;
 
 import java.time.LocalDateTime;

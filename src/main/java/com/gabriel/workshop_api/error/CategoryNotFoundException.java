@@ -1,4 +1,4 @@
-package com.gabriel.workshop_api.exception;
+package com.gabriel.workshop_api.error;
 
 public class CategoryNotFoundException extends RuntimeException{
     public CategoryNotFoundException(String message) {

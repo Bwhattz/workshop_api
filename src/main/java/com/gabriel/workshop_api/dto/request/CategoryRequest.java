@@ -1,4 +1,4 @@
-package com.gabriel.workshop_api.request;
+package com.gabriel.workshop_api.dto.request;
 
 import com.gabriel.workshop_api.model.Category;
 import jakarta.validation.constraints.NotBlank;

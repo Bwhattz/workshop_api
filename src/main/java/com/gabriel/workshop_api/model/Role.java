@@ -1,5 +1,6 @@
 package com.gabriel.workshop_api.model;
 
+import com.gabriel.workshop_api.emus.StatusProfile;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,12 +18,16 @@ public class Role {
     private Long id;
 
     @Column(name = "name", nullable = false, unique = true, length = 50)
-    private String name;
+    private StatusProfile status;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_role", nullable = false)
+    private User user;
 
     public void update(Role updateRole) {
 
-        if(updateRole.getName() != null) {
-            this.name = updateRole.getName();
+        if(updateRole.getStatus() != null) {
+            this.status = updateRole.getStatus();
         }
     }
 }

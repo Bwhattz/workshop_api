@@ -1,4 +1,4 @@
-package com.gabriel.workshop_api.exception;
+package com.gabriel.workshop_api.error;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

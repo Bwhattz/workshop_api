@@ -1,8 +1,8 @@
 package com.gabriel.workshop_api.controller;
 
 import com.gabriel.workshop_api.model.Role;
-import com.gabriel.workshop_api.request.RoleRequest;
-import com.gabriel.workshop_api.response.RoleResponse;
+import com.gabriel.workshop_api.dto.request.RoleRequest;
+import com.gabriel.workshop_api.dto.response.RoleResponse;
 import com.gabriel.workshop_api.service.RoleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

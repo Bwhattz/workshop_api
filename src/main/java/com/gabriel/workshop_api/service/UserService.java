@@ -1,18 +1,23 @@
 package com.gabriel.workshop_api.service;
 
-import com.gabriel.workshop_api.emus.RoleType;
-import com.gabriel.workshop_api.exception.RoleNotFoundException;
-import com.gabriel.workshop_api.exception.UserNotFoundException;
+import com.gabriel.workshop_api.emus.StatusProfile;
+import com.gabriel.workshop_api.emus.UserStatus;
+import com.gabriel.workshop_api.error.EmailDuplicateException;
+import com.gabriel.workshop_api.error.RoleNotFoundException;
+import com.gabriel.workshop_api.error.UserNotFoundException;
 import com.gabriel.workshop_api.model.Role;
 import com.gabriel.workshop_api.model.User;
 import com.gabriel.workshop_api.repository.RoleRepository;
 import com.gabriel.workshop_api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -32,14 +37,28 @@ public class UserService {
     @Transactional
     public User save(User user) {
 
-        Role defaultRole = roleRepository.findById(user.getId())
-                        .orElseThrow(() -> new RoleNotFoundException("Perfil de acesso não cadastrado no sistema"));
+        String role = user.getRoles().stream()
+                .filter(rol -> rol.getStatus() == StatusProfile.PARTICIPANT)
+                .findFirst()
+                .map(rol -> rol.getStatus().name())
+                .orElseThrow(() -> new IllegalArgumentException("O usuário não está associado a nenhum cargo"));
 
-        validateEmail(user);
+        Role defaultRole = roleRepository.findByRole(role)
+                        .orElseThrow(() -> new RoleNotFoundException("É necessário requer um cargo"));
 
-        String passwordCrypto = passwordEncoder.encode(user.getPassword());
-        user.setPassword(passwordCrypto);
+        user.setEmail(user.getEmail().toLowerCase().trim());
 
+        String validateEmail = validateEmail(user);
+
+        user.setEmail(validateEmail);
+
+        String passwordHash = passwordEncoder.encode(user.getPassword());
+
+        user.setPassword(passwordHash);
+
+        validatePassword(user);
+
+        user.getRoles().clear();
         user.getRoles().add(defaultRole);
 
         return userRepository.save(user);
@@ -49,14 +68,33 @@ public class UserService {
      * Valida se o email ja foi cadastro, para não gera conflito
      */
 
-    public void validateEmail(User user) {
+    public String validateEmail(User user) {
         if(userRepository.existsByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("Email já cadastrado");
+            throw new EmailDuplicateException("Email já cadastrado");
+        }
+
+        return user.getEmail().toLowerCase();
+    }
+
+    public void validatePassword(User user) {
+
+        Objects.requireNonNull(user.getPassword(), "A senha não pode ser vazia");
+
+        if(user.getPassword().length() < 6) {
+            throw new IllegalArgumentException("A senha precisa conter pelo menos 8 caracteres");
         }
     }
 
+    @Transactional(readOnly = true)
+    @Cacheable("users")
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable("users")
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
     }
 
     /**
@@ -72,7 +110,7 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
 
         userRepository.findByUser(user.getName(), user.getEmail()).ifPresent(existsUser -> {
-            if(!foundUser.getId().equals(user.getId())) {
+            if(!existsUser.getId().equals(user.getId())) {
                 throw new IllegalArgumentException("Já existe outro usuário cadastro com este nome e email");
             }
         });
@@ -82,12 +120,12 @@ public class UserService {
         return userRepository.save(foundUser);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Optional<User> findByUser(String name, String email) {
         return userRepository.findByUser(name, email);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<User> findByRoles(String roleName) {
         return userRepository.findByRolesNative(roleName);
     }
@@ -95,9 +133,10 @@ public class UserService {
     @Transactional
     public void delete(Long id) {
 
-        if(!userRepository.existsById(id)) {
-            throw new UserNotFoundException("Usuário não encontrado");
-        }
+        User foundUserToDelete = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+
+        foundUserToDelete.setStatus(UserStatus.DESACTIVED);
 
         userRepository.deleteById(id);
     }

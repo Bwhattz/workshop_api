@@ -2,6 +2,7 @@ package com.gabriel.workshop_api.config.security;
 
 import com.gabriel.workshop_api.config.security.JwtAuthenticationFilter;
 import com.gabriel.workshop_api.config.security.JwtService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,11 +34,20 @@ public class Security {
                 .cors(cors -> cors.configurationSource(corsConfiguration()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth.
+
                         requestMatchers("/auth/**", "/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+
                         .requestMatchers(HttpMethod.POST, "/users/**").hasAnyRole("USER", "ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/users/").permitAll()
+
                         .requestMatchers(HttpMethod.GET, "/registration/**").hasRole("PARTICIPANT")
+
+
                         .anyRequest().authenticated()).addFilterBefore(new JwtAuthenticationFilter(jwtService), UsernamePasswordAuthenticationFilter.class
-                );
+                ).exceptionHandling(exception -> exception.authenticationEntryPoint((request, response, authException) -> {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                }));
 
         return httpSecurity.build();
     }

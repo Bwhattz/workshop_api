@@ -1,5 +1,6 @@
 package com.gabriel.workshop_api.config.security;
 
+import com.gabriel.workshop_api.emus.StatusProfile;
 import com.gabriel.workshop_api.model.Role;
 import com.gabriel.workshop_api.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class RoleInitializer implements CommandLineRunner {
 
         if(roleRepository.findByRole(roleName).isEmpty()) {
             roleRepository.save(Role.builder()
-                    .name(roleName)
+                    .status(StatusProfile.PARTICIPANT)
                     .build());
         }
     }

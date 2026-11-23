@@ -1,8 +1,8 @@
 package com.gabriel.workshop_api.controller;
 
 import com.gabriel.workshop_api.model.Event;
-import com.gabriel.workshop_api.request.EventRequest;
-import com.gabriel.workshop_api.response.EventResponse;
+import com.gabriel.workshop_api.dto.request.EventRequest;
+import com.gabriel.workshop_api.dto.response.EventResponse;
 import com.gabriel.workshop_api.service.EventService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

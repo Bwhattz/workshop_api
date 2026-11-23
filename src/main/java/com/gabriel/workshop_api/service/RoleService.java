@@ -1,7 +1,6 @@
 package com.gabriel.workshop_api.service;
 
-import com.gabriel.workshop_api.exception.RoleNotFoundException;
-import com.gabriel.workshop_api.model.Registration;
+import com.gabriel.workshop_api.error.RoleNotFoundException;
 import com.gabriel.workshop_api.model.Role;
 import com.gabriel.workshop_api.model.User;
 import com.gabriel.workshop_api.repository.RoleRepository;

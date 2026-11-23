@@ -3,7 +3,8 @@ package com.gabriel.workshop_api.emus;
 public enum UserStatus {
 
     ACTIVED("ACTIVE"),
-    DESACTIVED("DESACTIVE");
+    DESACTIVED("DESACTIVE"),
+    INACTIVED("INACTIVE");
 
     private String status;
 

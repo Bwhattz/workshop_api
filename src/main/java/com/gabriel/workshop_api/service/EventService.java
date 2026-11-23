@@ -1,6 +1,6 @@
 package com.gabriel.workshop_api.service;
 
-import com.gabriel.workshop_api.exception.EventNotFoundException;
+import com.gabriel.workshop_api.error.EventNotFoundException;
 import com.gabriel.workshop_api.model.Event;
 import com.gabriel.workshop_api.repository.EventRepository;
 import org.springframework.transaction.annotation.Transactional;

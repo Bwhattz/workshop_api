@@ -1,8 +1,8 @@
 package com.gabriel.workshop_api.controller;
 
 import com.gabriel.workshop_api.model.Category;
-import com.gabriel.workshop_api.request.CategoryRequest;
-import com.gabriel.workshop_api.response.CategoryResponse;
+import com.gabriel.workshop_api.dto.request.CategoryRequest;
+import com.gabriel.workshop_api.dto.response.CategoryResponse;
 import com.gabriel.workshop_api.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

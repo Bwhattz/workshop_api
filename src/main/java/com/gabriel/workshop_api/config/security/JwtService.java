@@ -1,6 +1,5 @@
 package com.gabriel.workshop_api.config.security;
 
-import com.gabriel.workshop_api.emus.RoleType;
 import com.gabriel.workshop_api.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -16,7 +15,6 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
@@ -38,7 +36,7 @@ public class JwtService {
     public String generateToken(User userToken) {
 
         List<String> roles = userToken.getRoles().stream()
-                .map(role -> role.getName())
+                .map(role -> role.getStatus().name())
                 .toList();
 
 
@@ -75,8 +73,9 @@ public class JwtService {
         return extractClaims(tokenEmail, Claims::getSubject);
     }
 
-    private <T> T extractClaims(String tokenEmail, Function<Claims, T> claimsFunction) {
+    public <T> T extractClaims(String tokenEmail, Function<Claims, T> claimsFunction) {
         final Claims claim = parseClaims(tokenEmail);
+
         return claimsFunction.apply(claim);
     }
 }

@@ -5,10 +5,12 @@ import com.gabriel.workshop_api.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
 
@@ -19,7 +21,19 @@ public interface UserRepository extends JpaRepository<User, Long> {
     )
     Optional<User> findByUser(@Param("name_user") String name, @Param("email_user") String email);
 
+    @Query(
+            value = "SELECT COUNT(user.id) FROM users user " +
+                    "WHERE user.user_email = :userEmail",
+            nativeQuery = true
+    )
     boolean existsByEmail(String email);
+
+    @Query(
+            value = "SELECT user.* FROM users user " +
+                    "WHERE user.user_email = :userEmail",
+            nativeQuery = true
+    )
+    Optional<User> findByUserEmail(String userEmail);
 
     @Query(
             value = "SELECT user.* FROM users AS user " +

@@ -1,10 +1,8 @@
 package com.gabriel.workshop_api.controller;
 
 import com.gabriel.workshop_api.model.Registration;
-import com.gabriel.workshop_api.request.RegistrationRequest;
-import com.gabriel.workshop_api.request.RoleRequest;
-import com.gabriel.workshop_api.response.RegistrationResponse;
-import com.gabriel.workshop_api.response.RoleResponse;
+import com.gabriel.workshop_api.dto.request.RegistrationRequest;
+import com.gabriel.workshop_api.dto.response.RegistrationResponse;
 import com.gabriel.workshop_api.service.RegistrationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

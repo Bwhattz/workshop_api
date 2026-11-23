@@ -1,4 +1,4 @@
-package com.gabriel.workshop_api.response;
+package com.gabriel.workshop_api.dto.response;
 
 import com.gabriel.workshop_api.model.Certificate;
 

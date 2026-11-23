@@ -1,73 +1,88 @@
 package com.gabriel.workshop_api.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gabriel.workshop_api.emus.UserStatus;
-import com.gabriel.workshop_api.model.Role;
+import com.gabriel.workshop_api.config.security.JwtService;
+import com.gabriel.workshop_api.config.security.Security;
 import com.gabriel.workshop_api.model.User;
+import com.gabriel.workshop_api.dto.request.UserRequest;
+import com.gabriel.workshop_api.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
-import java.time.LocalDateTime;
-
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = com.gabriel.workshop_api.WorkShopApiApplication.class)
-@AutoConfigureMockMvc
-@AutoConfigureTestDatabase
-public class UserTestController {
+@WebMvcTest(UserController.class)
+@AutoConfigureMockMvc(addFilters = false)
+@Import(Security.class)
+public class UserControllerTest {
 
     @Autowired
-    private final MockMvc mockMvc;
+    private MockMvc mockMvc;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserService userService;
 
     @Autowired
-    private final ObjectMapper objectMapper;
-
-    public UserTestController(MockMvc mockMvc, ObjectMapper objectMapper) {
-        this.mockMvc = mockMvc;
-        this.objectMapper = objectMapper;
-    }
+    private ObjectMapper objectMapper;
 
     @Test
     @DisplayName("cadastrar um usuário no sistema")
-    void logginUser() throws Exception {
+    void createUser() throws Exception {
 
-        User user = User.builder()
-                .name("Gabriel")
-                .email("contatohatz@gmail.com")
-                .password("gabriel@123")
-                .status(UserStatus.ACTIVED)
-                .createdAt(LocalDateTime.now())
-                .build();
+      UserRequest userRequest = new UserRequest("Gabriel", "contatogabriel123@gmail.com", "gabriel@123");
 
-        mockMvc.perform(post("/users")
+      User user = userRequest.toEntityUser();
+
+      user.setId(1L);
+      user.setIdUser("USER-1233");
+
+      when(userService.save(any(User.class))).thenReturn(user);
+
+        mockMvc.perform(post("/users/login")
+                        .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(user)))
+                .content(objectMapper.writeValueAsString(userRequest)))
                 .andExpect(status().is(HttpStatus.CREATED.value()))
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value("Gabriel"))
-                .andExpect(jsonPath("$.email").value("gabriel.lv.lucas@gmail.com"))
-                .andExpect(jsonPath("$.password").value("gabriel@123"))
-                .andExpect(jsonPath("$.status").value("ACTIVED"))
-                .andExpect(jsonPath("$.created_at").exists());
+                .andExpect(jsonPath("$.name").exists())
+                .andExpect(jsonPath("$.email").exists())
+                .andExpect(jsonPath("$.password").doesNotExist())
+                .andExpect(jsonPath("$.status").exists())
+                .andExpect(jsonPath("$.created_at").exists())
+                .andExpect(jsonPath("$.role").isArray());
     }
 
     @Test
     @DisplayName("verificando se a API buscar pelo id")
     void getUser() throws Exception {
 
+       User userRequest = new UserRequest("Gabriel", "contatogabriel123@gmail.com", "gabriel123@").toEntityUser();
+
+       userRequest.setId(1L);
+
+       userRequest.setIdUser("USER-1233");
+
         mockMvc.perform(get("/users")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userRequest)))
+                .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(jsonPath("$.id").value(1));
     }
 
@@ -75,17 +90,12 @@ public class UserTestController {
     @DisplayName("cadastrar com alguns campos inexistentes")
     void nullHolder() throws Exception {
 
-
-        User user = User.builder()
-                .name("")
-                .email("")
-                .password("")
-                .build();
+        User user = new UserRequest("")
 
         mockMvc.perform(post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(user)))
-                .andExpect(status().is(HttpStatus.CREATED.value()))
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(jsonPath("$.name").value(""))
                 .andExpect(jsonPath("$.email").value(""))
                 .andExpect(jsonPath("$.password").value(""))

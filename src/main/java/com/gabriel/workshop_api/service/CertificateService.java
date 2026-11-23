@@ -1,7 +1,6 @@
 package com.gabriel.workshop_api.service;
 
-import com.gabriel.workshop_api.exception.CertificateNotFoundException;
-import com.gabriel.workshop_api.exception.RegistrationNotFoundException;
+import com.gabriel.workshop_api.error.RegistrationNotFoundException;
 import com.gabriel.workshop_api.model.Certificate;
 import com.gabriel.workshop_api.model.Registration;
 import com.gabriel.workshop_api.repository.CertificateRepository;

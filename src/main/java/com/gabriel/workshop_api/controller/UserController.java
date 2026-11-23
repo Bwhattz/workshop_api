@@ -2,8 +2,8 @@ package com.gabriel.workshop_api.controller;
 
 import com.gabriel.workshop_api.config.security.JwtService;
 import com.gabriel.workshop_api.model.User;
-import com.gabriel.workshop_api.request.UserRequest;
-import com.gabriel.workshop_api.response.UserResponse;
+import com.gabriel.workshop_api.dto.request.UserRequest;
+import com.gabriel.workshop_api.dto.response.UserResponse;
 import com.gabriel.workshop_api.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class UserController {
     private final UserService userService;
     private final JwtService jwtToken;
 
-    @PostMapping
+    @PostMapping(value = "/login")
     public ResponseEntity<UserResponse> create(@RequestBody @Valid UserRequest userRequest) {
 
         User user = userRequest.toEntityUser();
@@ -44,7 +44,7 @@ public class UserController {
                 .map(UserResponse::fromUser)
                 .toList();
 
-        return ResponseEntity.ok().body(findAllUsers);
+        return ResponseEntity.status(HttpStatus.OK).body(findAllUsers);
     }
 
     @PutMapping
@@ -64,7 +64,7 @@ public class UserController {
 
         userService.delete(id);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping(value = "/{name}/{email}")
@@ -76,13 +76,13 @@ public class UserController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
-    @GetMapping(value = "role/{role}")
-    public ResponseEntity<List<UserResponse>> findByRoles(@PathVariable String name) {
+    @GetMapping(value = "role/{rolesName}")
+    public ResponseEntity<List<UserResponse>> findByRoles(@PathVariable String rolesName) {
 
-        List<UserResponse> listRoles = userService.findByRoles(name).stream()
+        List<UserResponse> listRoles = userService.findByRoles(rolesName).stream()
                 .map(UserResponse::fromUser)
                 .toList();
 
-        return ResponseEntity.ok().body(listRoles);
+        return ResponseEntity.status(HttpStatus.OK).body(listRoles);
     }
 }
