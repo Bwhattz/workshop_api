@@ -13,7 +13,7 @@ public record EventResponse(
         LocalDateTime startTime,
         LocalDateTime endTime,
         Integer capacity,
-        EventStatus status
+        String status
 ) {
     public static EventResponse fromEvent(Event event) {
 
@@ -25,7 +25,7 @@ public record EventResponse(
                 event.getStartTime(),
                 event.getEndTime(),
                 event.getCapacity(),
-                event.getStatus()
+                event.getStatus().name()
 
         );
     }

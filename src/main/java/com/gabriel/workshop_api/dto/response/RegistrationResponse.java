@@ -14,11 +14,15 @@ public record RegistrationResponse(
         Long userId
 ) {
         public static RegistrationResponse fromRegistration(Registration registration) {
+
+                final Long eventId = registration.getId() != null ? registration.getEvent().getId() : null;
+                final Long userId = registration.getUser() != null ? registration.getUser().getId() : null;
+
                 return new RegistrationResponse(
                         registration.getRegistrationDate(),
                         registration.getStatus(),
-                        registration.getEvent() != null ? registration.getEvent().getId() : null,
-                        registration.getUser() != null ? registration.getUser().getId() : null
+                        eventId,
+                        userId
                 );
         }
 }

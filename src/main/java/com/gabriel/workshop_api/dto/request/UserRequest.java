@@ -1,10 +1,9 @@
 package com.gabriel.workshop_api.request;
 
-import com.gabriel.workshop_api.emus.RoleType;
+import com.gabriel.workshop_api.emus.StatusProfile;
+import com.gabriel.workshop_api.emus.UserStatus;
 import com.gabriel.workshop_api.model.User;
 import jakarta.validation.constraints.*;
-
-import java.util.List;
 
 public record UserRequest(
 
@@ -13,7 +12,7 @@ public record UserRequest(
         String name,
 
         @NotBlank(message = "Email precisa ser obrigátorio")
-        @Email(message = "Email inválido")
+        @Email
         String email,
 
         @NotBlank(message = "A senha precisa ser obrigátoria")
@@ -28,7 +27,7 @@ public record UserRequest(
                 .name(this.name())
                 .email(this.email())
                 .password(this.password())
-                .role(RoleType.PARTICIPANT)
+                .status(UserStatus.ACTIVED)
                 .build();
     }
 }
