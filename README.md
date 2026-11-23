@@ -1,4 +1,4 @@
-Workshop API - Sistema de Eventos Acadêmicos
+ANAKATON API - Sistema de Eventos Acadêmicos
 API REST Stateless desenvolvida para o gerenciamento de eventos acadêmicos, controle de inscrições e emissão de certificados.
 
 Equipe de Desenvolvimento
