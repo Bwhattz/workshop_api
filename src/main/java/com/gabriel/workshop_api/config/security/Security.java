@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -21,32 +22,48 @@ import java.util.Arrays;
 import java.util.List;
 
 @Configuration
-@RequiredArgsConstructor
 public class Security {
 
     private final JwtService jwtService;
+
+    public Security(JwtService jwtService) {
+        this.jwtService = jwtService;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
         httpSecurity
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfiguration()))
+                .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth.
-
                         requestMatchers("/auth/**", "/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/users/login").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/users/**").hasAnyRole("ADMIN", "ORGANIZE")
+                        .requestMatchers(HttpMethod.PUT, "/users/**").hasAnyRole("ADMIN" ,"PARTICIPANT")
+                        .requestMatchers(HttpMethod.DELETE, "/users/delete/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "users/find_user/{name}/{email}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "users/role/{rolesName}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/roles/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/roles/role/{roleName}").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/roles/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/roles/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/registrations/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/registrations/**").hasAnyRole("ADMIN", "ORGANIZE")
 
-                        .requestMatchers(HttpMethod.POST, "/users/**").hasAnyRole("USER", "ADMIN")
 
-                        .requestMatchers(HttpMethod.POST, "/users/").permitAll()
-
-                        .requestMatchers(HttpMethod.GET, "/registration/**").hasRole("PARTICIPANT")
-
-
-                        .anyRequest().authenticated()).addFilterBefore(new JwtAuthenticationFilter(jwtService), UsernamePasswordAuthenticationFilter.class
-                ).exceptionHandling(exception -> exception.authenticationEntryPoint((request, response, authException) -> {
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                        .anyRequest().authenticated()
+                ).addFilterBefore(new JwtAuthenticationFilter(jwtService), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exception -> exception.accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acesso negado");
+                }))
+                .exceptionHandling(exception -> exception.authenticationEntryPoint((request, response, authException) -> {
+                    if(authException == null) {
+                        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    } else {
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                    }
                 }));
 
         return httpSecurity.build();
@@ -54,10 +71,7 @@ public class Security {
 
     @Bean
     public RoleHierarchy roleHierarchy() {
-        return RoleHierarchyImpl.withDefaultRolePrefix()
-                .role("ADMIN")
-                .implies("USER", "PARTICIPANT")
-                .build();
+        return RoleHierarchyImpl.fromHierarchy("ROLE_ADMIN > ROLE_ORGANIZE > ROLE_PARTICIPANT");
     }
 
     @Bean
